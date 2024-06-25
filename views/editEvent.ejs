@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Evento</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <img src="./img/UNIFOR.png" width="60" alt="" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/"
+                >PÁGINA INICIAL</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/organizador">ÁREA DO ORGANIZADOR</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                >INSCRIÇÕES</a
+              >
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/participante"
+                    >ÁREA DO INSCRITO</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1>Editar Evento</h1>
+      <form id="edit-evento-form">
+        <div class="form-group">
+          <label for="nomeEvento">Nome do Evento</label>
+          <input type="text" class="form-control" id="nomeEvento" required />
+        </div>
+        <div class="form-group">
+          <label for="dataEvento">Data do Evento</label>
+          <input type="date" class="form-control" id="dataEvento" required />
+        </div>
+        <div class="form-group">
+          <label for="descEvento">Descrição do Evento</label>
+          <textarea
+            class="form-control"
+            id="descEvento"
+            rows="3"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      async function carregarDadosEvento() {
+        const eventoId = window.location.pathname.split("/")[2];
+
+        try {
+          const response = await axios.get(`/evento/${eventoId}/editar/dados`);
+          const evento = response.data;
+
+          document.getElementById("nomeEvento").value = evento.nome;
+          document.getElementById("dataEvento").value = new Date(evento.data)
+            .toISOString()
+            .split("T")[0];
+          document.getElementById("descEvento").value = evento.descricao;
+        } catch (err) {
+          console.error("Erro ao carregar dados do evento:", err);
+        }
+      }
+
+      document
+        .getElementById("edit-evento-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const eventoId = window.location.pathname.split("/")[2];
+
+          const nomeEvento = document.getElementById("nomeEvento").value;
+          const dataEvento = document.getElementById("dataEvento").value;
+          const descEvento = document.getElementById("descEvento").value;
+
+          try {
+            const response = await axios.post(`/evento/${eventoId}/editar`, {
+              nomeEvento,
+              dataEvento,
+              descEvento,
+            });
+
+            if (response.status === 200) {
+              alert("Evento atualizado com sucesso!");
+              window.location.href = "/";
+            }
+          } catch (err) {
+            console.error("Erro ao atualizar evento:", err);
+            alert("Erro ao atualizar evento");
+          }
+        });
+
+      carregarDadosEvento();
+    </script>
+  </body>
+</html>
